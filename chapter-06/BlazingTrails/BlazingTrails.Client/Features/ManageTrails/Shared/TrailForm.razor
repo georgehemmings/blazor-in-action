@@ -109,9 +109,9 @@
 </EditForm>
 
 @code {
-    private TrailDto _trail = new TrailDto();
+    private TrailDto _trail = new();
     private IBrowserFile? _trailImage;
-    private EditContext _editContext = default!;
+    private EditContext _editContext = null!;
 
     [Parameter, EditorRequired] public Func<TrailDto, IBrowserFile?, Task> OnSubmit { get; set; } = default!;
     [Parameter] public TrailDto? Trail { get; set; }
@@ -125,8 +125,13 @@
         _trailImage = null;
     }
 
+    private TrailDto? _previousTrail;
+
     protected override void OnParametersSet()
     {
+        if (Trail == _previousTrail && _editContext != null)
+            return; // Don't overwrite any unsaved edits.
+        
         _editContext = new EditContext(_trail);
         _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
 
@@ -147,6 +152,8 @@
                 Stage = ri.Stage,
                 Description = ri.Description
             }));
+
+            _previousTrail = Trail;
         }
     }
 

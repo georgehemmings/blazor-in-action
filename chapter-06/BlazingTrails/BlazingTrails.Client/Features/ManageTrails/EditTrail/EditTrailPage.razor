@@ -79,14 +79,17 @@ else
         }
         else
         {
-            _trail.Name = trail.Name;
-            _trail.Description = trail.Description;
-            _trail.Location = trail.Location;
-            _trail.Length = trail.Length;
-            _trail.TimeInMinutes = trail.TimeInMinutes;
-            _trail.Route.Clear();
-            _trail.Route.AddRange(trail.Route.Select(ri => new TrailDto.RouteInstruction
+            var editedTrail = new TrailDto
+            {
+                Id = _trail.Id,
+                Name = trail.Name,
+                Description = trail.Description,
+                Location = trail.Location,
+                Length = trail.Length,
+                TimeInMinutes = trail.TimeInMinutes
+            };
 
+            editedTrail.Route.AddRange(trail.Route.Select(ri => new TrailDto.RouteInstruction
             {
                 Stage = ri.Stage,
                 Description = ri.Description
@@ -94,16 +97,18 @@ else
 
             _submitSuccessful = true;
 
-            if (trail.ImageAction == ImageAction.Add) _submitSuccessful = await ProcessImage(trail.Id, image!);
-            if (trail.ImageAction == ImageAction.Remove) _trail.Image = null;
+            if (trail.ImageAction == ImageAction.Add) _submitSuccessful = await ProcessImage(editedTrail, image!);
+            if (trail.ImageAction == ImageAction.Remove) editedTrail.Image = null;
+
+            _trail = editedTrail;
         }
 
         StateHasChanged();
     }
 
-    private async Task<bool> ProcessImage(int trailId, IBrowserFile trailImage)
+    private async Task<bool> ProcessImage(TrailDto editedTrail, IBrowserFile trailImage)
     {
-        var imageUploadResponse = await Mediator.Send(new UploadTrailImageRequest(trailId, trailImage));
+        var imageUploadResponse = await Mediator.Send(new UploadTrailImageRequest(editedTrail.Id, trailImage));
 
         if (string.IsNullOrWhiteSpace(imageUploadResponse.ImageName))
         {
@@ -111,7 +116,7 @@ else
             return false;
         }
 
-        _trail.Image = imageUploadResponse.ImageName;
+        editedTrail.Image = imageUploadResponse.ImageName;
         return true;
     }
 }
