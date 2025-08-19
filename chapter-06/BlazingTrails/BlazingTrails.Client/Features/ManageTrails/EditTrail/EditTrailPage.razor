@@ -27,6 +27,8 @@ else
         <ErrorAlert Message="@_errorMessage" />
     }
 
+    <button @onclick="StateHasChanged">StateHasChanged</button>
+
     <TrailForm Trail="_trail" OnSubmit="SubmitEditTrail" />
 }
 
