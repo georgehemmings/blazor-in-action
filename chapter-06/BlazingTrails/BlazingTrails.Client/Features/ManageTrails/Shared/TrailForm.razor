@@ -169,6 +169,19 @@
         _trail.ImageAction = ImageAction.Remove;
     }
 
-    private async Task SubmitForm() => await OnSubmit(_trail, _trailImage);
-
+    private async Task SubmitForm()
+    {
+        var clonedTrail = new TrailDto
+        {
+            Id = _trail.Id,
+            Name = _trail.Name,
+            Description = _trail.Description,
+            ImageAction = _trail.ImageAction,
+            Image = _trail.Image,
+            Location = _trail.Location,
+            TimeInMinutes = _trail.TimeInMinutes,
+            Route = _trail.Route
+        };
+        await OnSubmit(clonedTrail, _trailImage);
+    }
 }
