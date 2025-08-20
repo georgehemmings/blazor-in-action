@@ -180,7 +180,12 @@
             Image = _trail.Image,
             Location = _trail.Location,
             TimeInMinutes = _trail.TimeInMinutes,
-            Route = _trail.Route
+            Route = _trail.Route.Select(x => new TrailDto.RouteInstruction
+            {
+                Description = x.Description,
+                Stage = x.Stage
+            }).ToList(),
+            Length = _trail.Length
         };
         await OnSubmit(clonedTrail, _trailImage);
     }
